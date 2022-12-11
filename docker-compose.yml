@@ -1,0 +1,47 @@
+# version isn't needed as of 2020 for docker compose CLI. 
+# All 2.x and 3.x features supported
+version: '3.4'
+
+services:
+
+  service1:
+    build:
+      context: ./services/service1
+      dockerfile: dockerFile
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5001/health" ]
+      interval: 1m
+      timeout: 30s
+      retries: 2
+      start_period: 30s
+    ports:
+      - '5001:5001'
+    hostname: service1
+    restart: on-failure
+    networks:
+      - devnetwork
+    environment:
+      - SERVICE2_URL=http://service2:5002
+
+  service2:
+    build:
+      context: ./services/service2
+      dockerfile: dockerFile
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5002/health" ]
+      interval: 1m
+      timeout: 30s
+      retries: 2
+      start_period: 30s
+    ports:
+      - '5002:5002'
+    hostname: service2
+    restart: on-failure
+    networks:
+      - devnetwork
+    environment:
+      - SERVICE1_URL=http://service1:5001
+
+networks:
+  devnetwork:
+    driver: bridge

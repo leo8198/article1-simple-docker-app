@@ -1,0 +1,23 @@
+FROM ubuntu:20.04
+
+WORKDIR /home/user/app
+
+RUN apt-get update
+
+# Install curl for internal health check
+RUN apt-get install curl -y
+
+# Install pip
+RUN apt-get install -y python3-pip
+
+# Install dependencies
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
+
+COPY . .
+
+EXPOSE 5001
+
+
+CMD ["bash","start.sh"]
